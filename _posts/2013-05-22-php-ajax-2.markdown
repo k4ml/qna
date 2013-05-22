@@ -1,0 +1,43 @@
+---
+layout: post
+title:  "PHP Ajax II"
+date:   2013-05-22 19:00:00
+categories: programming
+---
+>http://www.w3schools.com/php/php_ajax_database.asp
+>
+>php dan ajax memang tak bole dalam page yg same ke?dah try buat page asing memang jadi tp bile masukkn sql pada page yg ade ajax,page akan jadi duplicate..
+
+Ingat dah setel. Bukan ke sebelum ni soalan yang sama ? Tidak ada beza ajax dengan http request biasa kerana kedua-duanya adalah ... http request ! Yang beza cuma data yang dikembalikan ke browser. Dalam non-ajax request, kita return full html page sebab itu yang browser faham dan boleh render supaya user boleh nampak dan baca page tersebut. Dalam ajax request, biasanya return xml ataupun sekarang lebih ramai yang return json jadi nama ajax pun dah tak valid. Kenapa xml atau json ? Sebab javascript memang secara native boleh baca xml atau json. Kita boleh je return csv atau apa-apa bentuk format sekalipun tapi nak kena tulis function sendiri utk parse data tersebut.
+
+Web programming semuanya berkisar sekitar request (input) dan response (output). Apa yang anda request - GET /customer.php?id=202 bermaksud lakukan request menggunakan http method GET dan pass data dalam bentuk query string iaitu "id=202". Kat server (php /python/nodejs/etc) terpulang mcm mana nak parse string "id=202" tapi biasanya id akan diparse sebagai key dan 202 sebagai value dgn "=" sebagai separator antara key dan value. Setelah dapat input maka kita perlu return response kepada browser (atau lebih tepat client kerana tak semestinya http request tu datang daripada browser je). Seperti mana input dalam bentuk string, response juga dalam bentuk string. Contoh basic response:-
+
+    HTTP/1.1 200 OK
+    Content-Type: text/html
+    Server: apache2
+    Connection: close
+    Cache-Control: no-cache
+    Pragma: no-cache
+    Content-Length: 105
+
+    <html>hello world</html>
+
+Dalam PHP anda mungkin cuma perlu tapi "echo '<html>hello world</html>" dan PHP handle utk return headers yang kat atas tapi itulah sebenarnya yang berlaku. Dah faham basic ni, bila buat ajax request, cuma pastikan data apa yang anda nak return kepada client. Contoh nak return string "<customer><id>202</id><name>Ali</name></customer>":-
+
+    echo "<customer><id>202</id><name>Ali</name></customer>";
+
+Pastikan itu saja data yang anda return kepada client. Jangan pula lepas tu ada lagi:-
+
+{% highlight php %}
+    <?php
+    echo "<customer><id>202</id><name>Ali</name></customer>";
+    ?>
+    <html>
+    <head>
+    <body>
+    <h1>Full page</h1>
+    </body>
+    </html>
+{% endhighlight %}
+
+Seperti mana saya pernah tulis sebelum ini, dalam PHP apa-apa saja di luar <?php ... ?> adalah equivalent kepada print/echo dan akan dikembalikan sebagai response kepada client. Itulah yang menjadi punca kepada duplicate content sebab anda return the WHOLE PAGE
