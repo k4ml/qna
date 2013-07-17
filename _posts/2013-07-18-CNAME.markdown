@@ -1,0 +1,38 @@
+---
+layout: post
+title:  "CNAME Untuk multiple websites"
+date:   2013-07-18 06:46:00
+categories: programming
+---
+>sedang mencari solution macam mana nak buat setting macam blogger tue.
+>
+>Develop system , then user boleh provide custom domain yang akan point pada subdomain pada web system tadi.
+>
+>Tengah cuba nak fahamkan CNAME dan A Record.Sebab kalo kat blogger , kena setting CNAME dan A record pada domain
+
+A:
+Just set a wildcard domain *.yourdomain.com -> your ip. Each user get their own subdomain.yourdomain.com. If they want custom domain, they can set a CNAME userdomain.com -> subdomain.yourdomain.com.
+
+On your application side, there are number of ways to handle the request.
+
+1. Use apache virtualhost to handle each domain - tedious. For every new subdomain, you have to add new vhost config.
+
+2. Handle the mapping for subdomain in your app - look for HOST header to determine what subdomain to handle. All subdomain being served from single virtualhost.
+
+CNAME basically an alias. Cth kamal.page.com adalah CNAME kepada very-long-domain.aws-southeast-1.com. Bila client cuba request kamal.page.com, dns akan tau subdomain tersebut adalah CNAME kepada very-long-domain.aws-southeast-1.com jadi dia akan query very-long-domain.aws-southeast-1.com utk dapatkan ip address.
+
+CNAME juga digunakan utk memudahkan pengurusan dns. Katakan kita ada 3 subdomain - web1.page.com, web2.page.com, web3.page.com. Kalau kita point ketiga-tiga subdomain ini terus kepada IP address (A record), maka setiap kali kita tukar IP, kita kena update ketiga-tiga subdomain tersebut. Jadi biasanya orang akan gunakan CNAME spt:-
+
+page.com IN A 69.90.210.213
+web1.page.com CNAME page.com
+web2.page.com CNAME page.com
+web3.page.com CNAME page.com
+
+Manakala bila kita point subdomain kepada IP, ia akan kelihatan spt:-
+
+page.com IN A 69.90.210.213
+web1.page.com IN A 69.90.210.213
+web2.page.com IN A 69.90.210.213
+web3.page.com IN A 69.90.210.213
+
+Kita dapat lihat dalam contoh di atas bila mana guna A record, setiap kali berlaku perubahan IP, kita kena update semua subdomain yang ada manakala yang guna CNAME, cuma perlu update main A record. Keburukan CNAME adalah resolving dns kepada ip mengambil masa yang lebih lama sebab client akan request subdomain terlebih dahulu, dapat record CNAME, kemudian query CNAME utk dapatkan IP.
